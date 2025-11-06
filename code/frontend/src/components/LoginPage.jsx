@@ -5,6 +5,7 @@ import MailIcon from "./mini-components/MailIcon";
 import LockIcon from "./mini-components/LockIcon";
 import EyeIcon from "./mini-components/EyeIcon";
 import EyeOffIcon from "./mini-components/EyeOffIcon";
+import { Link } from "react-router-dom";
 
 
 export default function LoginPage() {
@@ -44,10 +45,6 @@ export default function LoginPage() {
       <div className="card fade-in">
         <div className="blob1" /><div className="blob2" />
         <div className="card-inner">
-          <div className="brand">
-            <span className="dot" />
-            travle
-          </div>
           <h1 className="h1">Welcome back</h1>
           <p className="sub">Sign in with your username or email</p>
 
@@ -98,7 +95,7 @@ export default function LoginPage() {
             </button>
 
             <div className="meta">
-              Haven't created an account yet? <a href="/register">Register here</a>
+                Haven't created an account yet? <Link to="/register">Register here</Link>
             </div>
           </form>
 

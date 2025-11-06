@@ -5,14 +5,8 @@ import MailIcon from "./mini-components/MailIcon";
 import LockIcon from "./mini-components/LockIcon";
 import EyeIcon from "./mini-components/EyeIcon";
 import EyeOffIcon from "./mini-components/EyeOffIcon";
-
-function UserIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden {...props}>
-      <path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
-    </svg>
-  );
-}
+import UserIcon from "./mini-components/UserIcon";
+import { Link } from "react-router-dom";
 
 function scorePassword(pw) {
   if (!pw) return { score: 0, label: "Too weak" };
@@ -125,7 +119,7 @@ export default function RegisterPage() {
         </section>
 
         <div className="card-inner short">
-          <div className="brand"><span className="dot" />travle</div>
+          
           <h1 className="h1">Create account</h1>
           <p className="sub">Username, email, and password</p>
 
@@ -167,7 +161,7 @@ export default function RegisterPage() {
               <input
                 className="input"
                 type={showPw ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
@@ -216,7 +210,7 @@ export default function RegisterPage() {
             </button>
 
             <div className="meta">
-              Already have an account? <a href="/login">Sign in</a>
+                Already have an account? <Link to="/login">Sign in</Link>
             </div>
           </form>
         </div>
