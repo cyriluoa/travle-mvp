@@ -1,0 +1,111 @@
+/* page reset to kill the faint top line */
+html, body, #root { height: 100%; background: #0b1020; }
+body { margin: 0; }
+
+/* attach theme vars to the page root, not :root */
+.home-wrap {
+  --bg1:#0b1020; --bg2:#101828; --glass:#141b2e;
+  --fg:#e6e9ef; --muted:#9aa5bd; --accent:#59c4ff; --accent2:#7c6cff;
+
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(89,196,255,.14), transparent),
+    linear-gradient(135deg, var(--bg1), var(--bg2));
+  color: var(--fg);
+
+  /* keep internal layers composited, avoids seam artifacts */
+  isolation: isolate;
+}
+
+/* scope everything under .home-wrap */
+.home-wrap * { box-sizing: border-box; }
+
+/* soft background shape */
+.home-wrap .home-bg {
+  position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(400px 240px at 85% 20%, rgba(124,108,255,.18), transparent 60%),
+    radial-gradient(420px 260px at 15% 80%, rgba(89,196,255,.14), transparent 60%);
+  filter: blur(12px);
+  opacity: .9;
+  z-index: 0;
+}
+
+/* top bar */
+.home-wrap .topbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; margin: 14px auto 0; max-width: 980px;
+  background: rgba(20,25,40,.55); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
+  box-shadow: none; /* ensure no subtle top hairline */
+}
+.home-wrap .brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.06);
+  letter-spacing: .08em; font-size: 12px; text-transform: lowercase;
+}
+.home-wrap .brand .dot { width: 6px; height: 6px; border-radius: 50%; background: #7dd3fc; display: inline-block; }
+.home-wrap .nav { display: flex; gap: 12px; }
+.home-wrap .nav-link {
+  padding: 8px 12px; border-radius: 12px; text-decoration: none; color: var(--fg);
+  border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.04);
+}
+.home-wrap .nav-link:hover { background: rgba(255,255,255,.08); }
+
+/* main content */
+.home-wrap .content { position: relative; z-index: 1; }
+.home-wrap .section { max-width: 980px; margin: 28px auto; padding: 0 16px; }
+.home-wrap .title { margin: 0 0 16px; font-size: 20px; font-weight: 600; color: var(--fg); }
+
+.home-wrap .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 920px) { .home-wrap .modes { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .home-wrap .modes { grid-template-columns: 1fr; } }
+
+/* cards */
+.home-wrap .card {
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(20,25,40,.6);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.35);
+}
+.home-wrap .card.muted { opacity: .8; }
+
+.home-wrap .card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 6px; }
+.home-wrap .card-head h3 { margin: 0; font-size: 16px; }
+.home-wrap .badge {
+  font-size: 11px; padding: 4px 8px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: white;
+}
+.home-wrap .badge.alt { background: linear-gradient(90deg, #36cfc9, #52c41a); }
+.home-wrap .badge.soon { background: linear-gradient(90deg, #faad14, #ff7a45); }
+
+.home-wrap .card-sub { margin: 6px 0 12px; color: var(--muted); font-size: 13px; }
+
+.home-wrap .custom-row {
+  display:flex; align-items:center; gap: 8px; margin: 20px 0 12px;
+}
+.home-wrap .input {
+  flex: 1 1 auto;
+  padding: 12px; font-size: 14px; color: var(--fg);
+  border-radius: 12px; outline: none;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+}
+.home-wrap .input::placeholder { color: #a7b1c7; }
+.home-wrap .arrow { opacity: .7; }
+
+.home-wrap .card-actions { display:flex; gap: 8px; }
+.home-wrap .btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 12px 14px; border-radius: 12px; border: 0; cursor: pointer;
+  color: white; text-decoration: none; font-weight: 600;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.home-wrap .btn:hover { filter: brightness(1.05); }
+.home-wrap .btn.disabled { opacity: .6; cursor: not-allowed; }

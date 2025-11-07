@@ -38,17 +38,22 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body ?? {};
-    if (!email || !password) return res.status(400).json({ error: "Missing fields" });
+    const { identifier, password } = req.body ?? {};
+    if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
 
     const { rows } = await query(
-      `SELECT id, username, email, password_hash FROM users WHERE email = $1 LIMIT 1`,
-      [email]
+      `SELECT id, username, email, password_hash FROM users WHERE email = $1 OR username = $1 LIMIT 1`,
+      [identifier]
     );
-    if (!rows.length) return res.status(401).json({ error: "Invalid credentials" });
+    if (!rows.length) return res.status(401).json({ error: "No such email or username" });
 
     const ok = await bcrypt.compare(password, rows[0].password_hash);
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+
+    await query(
+      `UPDATE users SET last_login_at = now() WHERE id = $1`,
+      [rows[0].id]
+    );
 
     return res.json({ id: rows[0].id, username: rows[0].username, email: rows[0].email });
   } catch (e) {
