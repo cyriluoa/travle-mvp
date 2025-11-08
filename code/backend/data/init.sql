@@ -7,3 +7,18 @@ CREATE TABLE public.users (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
   last_login_at  TIMESTAMPTZ
 );
+
+
+CREATE TABLE IF NOT EXISTS daily_routes (
+    id SERIAL PRIMARY KEY,
+    date DATE UNIQUE NOT NULL,
+    start_country TEXT NOT NULL,
+    end_country TEXT NOT NULL,
+    route TEXT[] NOT NULL,
+    route_length INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_daily_routes_date ON daily_routes(date);
+
