@@ -1,0 +1,81 @@
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# --- logs ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- dependencies ---
+node_modules/
+**/node_modules/
+
+# --- env / secrets ---
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# --- build outputs ---
+build/
+dist/
+**/build/
+**/dist/
+.tmp/
+temp/
+.cache/
+.parcel-cache/
+.eslintcache
+.turbo/
+.next/
+out/
+
+# --- testing / coverage ---
+coverage/
+.nyc_output/
+
+# --- tooling ---
+.storybook-out/
+.cypress/
+playwright-report/
+test-results/
+
+# --- package managers / lock junk ---
+.pnpm-store/
+.bun/
+.bun-install/
+*.tsbuildinfo
+
+# --- frameworks (React/Vite/CRA) ---
+vite.config.ts.timestamp-*
+vite.config.js.timestamp-*
+**/public/*.map
+**/*.map
+
+# --- Docker / containers ---
+docker-data/
+**/docker-data/
+*.pid
+*.seed
+*.pid.lock
+
+# --- Postgres / DB artifacts ---
+*.sql
+*.dump
+pgdata/
+db-data/
+**/pgdata/
+**/db-data/
+
+# --- images and uploads (app runtime) ---
+uploads/
+storage/

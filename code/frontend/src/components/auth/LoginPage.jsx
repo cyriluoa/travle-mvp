@@ -23,15 +23,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error || "Invalid credentials");
-      }
-      navigate("/home", { replace: true });
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier, password }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error || "Invalid credentials");
+    }
+    const body = await res.json(); // { token, user }
+    localStorage.setItem("token", body.token);
+    localStorage.setItem("user", JSON.stringify(body.user));
+    navigate("/home", { replace: true });
+
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {

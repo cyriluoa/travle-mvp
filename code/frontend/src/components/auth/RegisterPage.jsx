@@ -77,6 +77,9 @@ export default function RegisterPage() {
         throw new Error(body.error || "Registration failed");
       }
 
+      const body = await res.json();               // expects { token, user }
+      localStorage.setItem("token", body.token);
+      localStorage.setItem("user", JSON.stringify(body.user));
       navigate("/home", { replace: true });
     } catch (err) {
       setError(err.message || "Registration failed");

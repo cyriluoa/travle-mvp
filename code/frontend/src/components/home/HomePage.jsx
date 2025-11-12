@@ -13,8 +13,9 @@ export default function HomePage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
-  // second field options (reachable >=2 hops)
+  // reachable options for "to" (>= 2 hops)
   const [reachable, setReachable] = useState([]);
+  const [reachableSet, setReachableSet] = useState(new Set());
   const [loadingReachable, setLoadingReachable] = useState(false);
 
   // error UI
@@ -23,23 +24,40 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   // load country list once from public/data
+  // load country list once from public/data, exclude countries with no neighbours
   useEffect(() => {
     fetch("/data/neighbors.json")
       .then((r) => r.json())
       .then((data) => {
-        const list = Object.keys(data).sort();
-        setCountries(list);
-        setCountrySet(new Set(list.map((x) => x.toLowerCase())));
+        // keep only keys whose neighbour array exists and has length > 0
+        const playable = Object.entries(data)
+          .filter(([, arr]) => Array.isArray(arr) && arr.length > 0)
+          .map(([name]) => name)
+          .sort();
+
+        setCountries(playable);
+        setCountrySet(new Set(playable.map((x) => x.toLowerCase())));
+
+        // if current "from" became invalid after filtering, clear it
+        if (from && !playable.map(x => x.toLowerCase()).includes(from.toLowerCase())) {
+          setFrom("");
+          setTo("");
+          setReachable([]);
+          setReachableSet(new Set());
+        }
       })
       .catch(() => {
-        // fallback: leave empty; UI will require manual input
+        // leave empty if load fails
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   function resetDialog() {
     setFrom("");
     setTo("");
     setReachable([]);
+    setReachableSet(new Set());
     setErr("");
     setOpen(false);
     setLoadingReachable(false);
@@ -55,29 +73,32 @@ export default function HomePage() {
     setFrom(val);
     setTo("");
     setReachable([]);
+    setReachableSet(new Set());
     setErr("");
 
     const key = val.trim().toLowerCase();
-    if (!key || !countrySet.has(key)) {
-      // invalid or empty -> keep second disabled
-      return;
-    }
+    if (!key || !countrySet.has(key)) return;
+
     setLoadingReachable(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/reachable?country=${encodeURIComponent(val.trim())}`);
+      const res = await fetch(
+        `http://localhost:5000/api/reachable?country=${encodeURIComponent(val.trim())}`
+      );
       const data = await res.json();
       if (!res.ok || data.error) {
         setErr(data.error || "Failed to load reachable countries");
         setReachable([]);
+        setReachableSet(new Set());
       } else {
-        setReachable(data.reachable || []);
-        if ((data.reachable || []).length === 0) {
-          setErr("No land-reachable countries available from this start.");
-        }
+        const list = data.reachable || [];
+        setReachable(list);
+        setReachableSet(new Set(list));
+        if (list.length === 0) setErr("No land-reachable countries available from this start.");
       }
     } catch {
       setErr("Network error while loading reachable countries.");
       setReachable([]);
+      setReachableSet(new Set());
     } finally {
       setLoadingReachable(false);
     }
@@ -92,6 +113,11 @@ export default function HomePage() {
     const b = to.trim();
     if (!a || !b) return;
 
+    if (!reachableSet.has(b)) {
+      setErr("Choose a destination from the suggested list.");
+      return;
+    }
+
     try {
       const res = await fetch(
         `http://localhost:5000/api/reachable/path?from=${encodeURIComponent(a)}&to=${encodeURIComponent(b)}`
@@ -101,7 +127,6 @@ export default function HomePage() {
         setErr(data.error || "No land path exists. Try different countries.");
         return;
       }
-      // ok to navigate
       resetDialog();
       navigate(`/play/custom?from=${encodeURIComponent(a)}&to=${encodeURIComponent(b)}`);
     } catch {
@@ -114,6 +139,8 @@ export default function HomePage() {
     !countrySet.has(from.trim().toLowerCase()) ||
     loadingReachable ||
     reachable.length === 0;
+
+  const isValidTo = !!to.trim() && reachableSet.has(to.trim());
 
   return (
     <div className="home-wrap">
@@ -214,7 +241,7 @@ export default function HomePage() {
 
             <form onSubmit={onConfirm}>
               <div className="custom-row" style={{ marginBottom: 12 }}>
-                {/* From: free text with suggestions from neighbors.json */}
+                {/* From: input + datalist */}
                 <input
                   className="input"
                   list="country-list"
@@ -230,26 +257,20 @@ export default function HomePage() {
 
                 <span className="arrow">→</span>
 
-                {/* To: locked to backend-provided reachable options */}
-                <select
+                {/* To: input + datalist (matches style of A) */}
+                <input
                   className="input"
-                  disabled={toDisabled}
+                  list="reachable-list"
+                  placeholder={loadingReachable ? "Loading options…" : "Country B (end)"}
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                >
-                  <option value="">
-                    {loadingReachable
-                      ? "Loading options…"
-                      : reachable.length
-                      ? "Choose destination"
-                      : "No reachable countries"}
-                  </option>
+                  disabled={toDisabled}
+                />
+                <datalist id="reachable-list">
                   {reachable.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
@@ -259,7 +280,7 @@ export default function HomePage() {
                 <button
                   type="submit"
                   className="btn"
-                  disabled={!from.trim() || !to.trim() || loadingReachable}
+                  disabled={!from.trim() || !to.trim() || loadingReachable || !isValidTo}
                 >
                   Confirm
                 </button>

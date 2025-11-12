@@ -4,6 +4,8 @@ import authRouter from "./routes/auth.js";
 import cors from "cors";
 import randomToday from "./routes/randomToday.js";
 import reachable from "./routes/reachable.js";
+import scoreRoutes from "./routes/score.js";
+
 
 dotenv.config();
 
@@ -15,7 +17,7 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/random-today", randomToday);
 app.use("/api/reachable", reachable);
-
+app.use("/api/score", scoreRoutes);
 
 const PORT = Number(process.env.PORT || 5000);
 app.listen(PORT, () => console.log(`API on :${PORT}`));

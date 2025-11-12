@@ -1,10 +1,19 @@
-
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import { query } from "../db.js";
+import jwt from "jsonwebtoken";   
 
 const router = Router();
 const SALT_ROUNDS = Number(process.env.SALT_ROUNDS || 12);
+
+function signUser(u) {                        // ← add
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET missing");
+  return jwt.sign(
+    { id: u.id, username: u.username, email: u.email },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || "30d" }
+  );
+}
 
 router.post("/register", async (req, res) => {
   try {
@@ -29,7 +38,9 @@ router.post("/register", async (req, res) => {
        RETURNING id, username, email, created_at`,
       [username, email, hash]
     );
-    return res.status(201).json({ user: rows[0] });
+    const user = rows[0];
+    const token = signUser(user);            
+    return res.status(201).json({ token, user });  
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Server error" });
@@ -38,6 +49,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
+    console.log("Hi")
     const { identifier, password } = req.body ?? {};
     if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
 
@@ -55,7 +67,10 @@ router.post("/login", async (req, res) => {
       [rows[0].id]
     );
 
-    return res.json({ id: rows[0].id, username: rows[0].username, email: rows[0].email });
+    const { password_hash, ...safeUser } = rows[0]; // drop hash
+    const token = signUser(safeUser);               // ← add
+    console.log(token)
+    return res.json({ token, user: safeUser });     // ← add
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Server error" });
