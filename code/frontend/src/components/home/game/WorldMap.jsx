@@ -99,7 +99,7 @@ export default function WorldMap({
     setConnected(hit);
     if (hit && !wasConnectedRef.current) {
       wasConnectedRef.current = true;
-      onConnected?.({ steps: guesses.length });
+      onConnected?.({ steps: guesses.length, route: [start, ...guesses, end]});
     }
   }, [start, end, guesses, neighbors, onConnected]);
 
@@ -159,7 +159,7 @@ export default function WorldMap({
     }
 
     const zoom = d3zoom()
-      .scaleExtent([1, 10])
+      .scaleExtent([1, 20])
       .translateExtent([[-width, -height], [2 * width, 2 * height]])
       .on("zoom", (event) => g.setAttribute("transform", event.transform.toString()));
 

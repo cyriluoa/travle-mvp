@@ -16,7 +16,5 @@ export function clearAuth() {
 export async function authedFetch(url, options = {}) {
   const token = getToken();
   const headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
-  const res = await fetch(url, { ...options, headers });
-  if (res.status === 401) clearAuth(); // optional: force logout on expiry
-  return res;
+  return fetch(url, { ...options, headers });
 }

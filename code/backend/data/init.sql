@@ -22,3 +22,28 @@ CREATE TABLE IF NOT EXISTS daily_routes (
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_daily_routes_date ON daily_routes(date);
 
+
+-- assumes users(id) exists
+CREATE TABLE game_history (
+  id              BIGSERIAL PRIMARY KEY,
+  user_id         BIGINT NOT NULL
+                   REFERENCES users(id)
+                   ON UPDATE RESTRICT
+                   ON DELETE CASCADE,
+  mode            SMALLINT    NOT NULL,                -- 1 = Play Today
+  fastest_route   TEXT        NOT NULL,                -- e.g., "CA->US->MX"
+  user_route      TEXT        NOT NULL,
+  max_points      INT         NOT NULL CHECK (max_points >= 0),
+  points_awarded  INT         NOT NULL DEFAULT 0 CHECK (points_awarded >= 0 AND points_awarded <= max_points),
+  completed_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Lookups
+CREATE INDEX IF NOT EXISTS idx_gh_user_time ON game_history (user_id, completed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_gh_mode_time ON game_history (mode, completed_at DESC);
+
+-- One scored Play Today per user per local day (America/Edmonton)
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_gh_daily_once
+  ON game_history (user_id, ((timezone('America/Edmonton', completed_at))::date))
+  WHERE mode = 1 AND points_awarded > 0;
+

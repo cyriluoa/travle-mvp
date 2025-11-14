@@ -4,6 +4,7 @@ import WorldMap from "./WorldMap";
 import QuitGame from "./QuitGame";
 import CongratsDialog from "./CongratsDialog";
 import { GameMode, ScoreEngine } from "../../../utils/score";
+import { authedFetch } from "../../../utils/auth";
 
 const scorer = new ScoreEngine();
 
@@ -19,6 +20,57 @@ export default function PlayToday() {
   const [showCongrats, setShowCongrats] = useState(false);
   const [stepsUsed, setStepsUsed] = useState(0);
   const [points, setPoints] = useState(null);
+  const [posted, setPosted] = useState(false);
+
+  async function handleConnected({steps, route }) {
+    setStepsUsed(steps);
+    const result = scorer.compute({
+      mode: GameMode.Today,
+      optimalSteps,
+      stepsUsed: steps,
+      hasQuit: false,
+    });
+    setPoints(result.points);
+
+     // theoretical max points if player used optimalSteps
+    const maxResult = scorer.compute({
+      mode: GameMode.Today,
+      optimalSteps,
+      stepsUsed: optimalSteps,
+      hasQuit: false,
+    });
+    const maxPoints = maxResult.points;
+
+    if (!posted && result.points > 0) {
+      setPosted(true);
+      try {
+        await authedFetch("http://localhost:5000/api/score/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ points: result.points }),
+        });
+
+        try {
+          await authedFetch("http://localhost:5000/api/game/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mode: 0,                 // 0 = Play Today
+              fastestRoute: data.path, // string[]
+              userRoute: route,        // string[] from WorldMap
+              maxPoints,
+              pointsAwarded: result.points,
+            }),
+          });
+        } catch (e) {
+          // optional: log
+        }
+      } catch (e) {
+        // optional: handle score/add error
+      }
+    }
+    setShowCongrats(true);
+  }
 
   useEffect(() => {
     let ignore = false;
@@ -70,12 +122,7 @@ export default function PlayToday() {
         edges={edges}
         countriesApart={countriesApart}
         onQuit={() => setShowQuit(true)}
-        onConnected={({ steps }) => {
-          setStepsUsed(steps);
-          const result = scorer.compute({ mode: GameMode.Today, optimalSteps, stepsUsed: steps, hasQuit: false });
-          setPoints(result.points);
-          setShowCongrats(true);
-        }}
+        onConnected={handleConnected}
       />
 
       <QuitGame

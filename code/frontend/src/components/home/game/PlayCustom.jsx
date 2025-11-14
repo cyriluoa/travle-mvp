@@ -5,6 +5,7 @@ import WorldMap from "./WorldMap";
 import QuitGame from "./QuitGame";
 import CongratsDialog from "./CongratsDialog";
 import { GameMode, ScoreEngine } from "../../../utils/score";
+import { authedFetch } from "../../../utils/auth";
 
 const scorer = new ScoreEngine();
 
@@ -23,6 +24,61 @@ export default function PlayCustom() {
   const [showCongrats, setShowCongrats] = useState(false);
   const [stepsUsed, setStepsUsed] = useState(0);
   const [points, setPoints] = useState(null);
+  const [posted, setPosted] = useState(false);
+
+  async function handleConnected({steps, route}) {
+    setStepsUsed(steps);
+    const result = scorer.compute({
+      mode: GameMode.Custom,
+      optimalSteps,
+      stepsUsed: steps,
+      hasQuit: false,
+    });
+    setPoints(result.points);
+
+    const maxResult = scorer.compute({
+          mode: GameMode.Custom,
+          optimalSteps,
+          stepsUsed: optimalSteps,
+          hasQuit: false,
+        });
+    const maxPoints = maxResult.points;
+
+    if (!posted && result.points > 0) {
+      setPosted(true);
+      try {
+        await authedFetch("http://localhost:5000/api/score/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ points: result.points }),
+        });
+        // optional: read { user } = await r.json() and update UI
+        try {
+          await authedFetch("http://localhost:5000/api/game/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mode: 1,                 
+              fastestRoute: data.path, 
+              userRoute: route,        
+              maxPoints,
+              pointsAwarded: result.points,
+            }),
+          });
+        } catch (e) {
+          // optional: log
+        }
+      } catch (err) {
+        // optional: toast/log  
+        console.log(err)
+        
+      }
+    }
+    setShowCongrats(true);
+  }
+
+
+
 
   useEffect(() => {
     let ignore = false;
@@ -83,12 +139,7 @@ export default function PlayCustom() {
         edges={data.edges}
         countriesApart={data.countriesApart}
         onQuit={() => setShowQuit(true)}
-        onConnected={({ steps }) => {
-          setStepsUsed(steps);
-          const result = scorer.compute({ mode: GameMode.Custom, optimalSteps, stepsUsed: steps, hasQuit: false });
-          setPoints(result.points);
-          setShowCongrats(true);
-        }}
+        onConnected={handleConnected}
       />
 
       <QuitGame

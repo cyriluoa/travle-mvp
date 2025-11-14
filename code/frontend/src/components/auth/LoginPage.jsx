@@ -31,9 +31,8 @@ export default function LoginPage() {
       const body = await res.json().catch(() => ({}));
       throw new Error(body?.error || "Invalid credentials");
     }
-    const body = await res.json(); // { token, user }
+    const body = await res.json(); 
     localStorage.setItem("token", body.token);
-    localStorage.setItem("user", JSON.stringify(body.user));
     navigate("/home", { replace: true });
 
     } catch (err) {

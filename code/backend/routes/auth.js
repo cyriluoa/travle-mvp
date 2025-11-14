@@ -38,9 +38,8 @@ router.post("/register", async (req, res) => {
        RETURNING id, username, email, created_at`,
       [username, email, hash]
     );
-    const user = rows[0];
     const token = signUser(user);            
-    return res.status(201).json({ token, user });  
+    return res.status(201).json({ token});  
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Server error" });
@@ -49,7 +48,6 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    console.log("Hi")
     const { identifier, password } = req.body ?? {};
     if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
 
@@ -69,8 +67,7 @@ router.post("/login", async (req, res) => {
 
     const { password_hash, ...safeUser } = rows[0]; // drop hash
     const token = signUser(safeUser);               // ← add
-    console.log(token)
-    return res.json({ token, user: safeUser });     // ← add
+    return res.json({ token });     // ← add
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Server error" });
