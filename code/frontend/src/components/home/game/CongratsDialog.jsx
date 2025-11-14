@@ -1,6 +1,6 @@
 // src/components/CongratsDialog.jsx
 // src/pages/CongratsDialog.jsx
-export default function CongratsDialog({ open, steps, isOptimal, shortestPath = [], optimalSteps, points, onContinue }) {
+export default function CongratsDialog({ open, steps, isOptimal, shortestPath = [], optimalSteps, points, isReplay,  onContinue }) {
   if (!open) return null;
   return (
     <div onClick={onContinue} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.6)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:60 }}>
@@ -19,9 +19,26 @@ export default function CongratsDialog({ open, steps, isOptimal, shortestPath = 
               {shortestPath?.length ? <div style={{ marginTop:6, opacity:.95 }}>Shortest path: {shortestPath.join(" → ")}</div> : null}
             </>
           )}
-          {typeof points === "number" ? (
-            <div style={{ marginTop:10, fontWeight:600 }}>Points earned: {points}</div>
-          ) : null}
+          {typeof points === "number" && (
+            <div style={{ marginTop: 10, fontWeight: 600 }}>
+              {isReplay ? (
+                <>
+                  Points you would have earned: {points}
+                  <div
+                    style={{
+                      fontWeight: 400,
+                      marginTop: 4
+                    }}
+                  >
+                    Since this isn’t your first attempt today, your total score
+                    will not increase.
+                  </div>
+                </>
+              ) : (
+                <>Points earned: {points}</>
+              )}
+            </div>
+          )}
         </div>
 
         <div style={{ display:"flex", justifyContent:"flex-end", marginTop:16 }}>

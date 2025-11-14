@@ -155,6 +155,7 @@ export default function PlayCustom() {
         shortestPath={data.path}
         optimalSteps={optimalSteps}
         points={points}
+        isReplay={false}
         onContinue={() => navigate("/home")}
       />
     </>

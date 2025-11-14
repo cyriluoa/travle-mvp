@@ -21,9 +21,11 @@ export default function PlayToday() {
   const [stepsUsed, setStepsUsed] = useState(0);
   const [points, setPoints] = useState(null);
   const [posted, setPosted] = useState(false);
+  const [replay, setReplay] = useState(false);
 
-  async function handleConnected({steps, route }) {
+  async function handleConnected({ steps, route }) {
     setStepsUsed(steps);
+
     const result = scorer.compute({
       mode: GameMode.Today,
       optimalSteps,
@@ -32,7 +34,7 @@ export default function PlayToday() {
     });
     setPoints(result.points);
 
-     // theoretical max points if player used optimalSteps
+    // theoretical max points if player used optimalSteps
     const maxResult = scorer.compute({
       mode: GameMode.Today,
       optimalSteps,
@@ -41,36 +43,79 @@ export default function PlayToday() {
     });
     const maxPoints = maxResult.points;
 
-    if (!posted && result.points > 0) {
-      setPosted(true);
+    try {
+      // Check if this user has already scored for today's game
+      let playedToday = false;
       try {
+        const res = await authedFetch(
+          "http://localhost:5000/api/game/todayStatus",
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (res.ok) {
+          const j = await res.json();
+          playedToday = !!j.played;
+        }
+      } catch (e) {
+        // if this fails, we just treat as not playedToday=false (best effort)
+      }
+
+      // Only award score and non-zero points once per day
+      if (!posted && result.points > 0 && !playedToday) {
+        setPosted(true);
+        setReplay(false);
+
+        // 1) Add to user's total score
         await authedFetch("http://localhost:5000/api/score/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ points: result.points }),
         });
 
+        // 2) Record a scored game_history row
         try {
           await authedFetch("http://localhost:5000/api/game/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              mode: 0,                 // 0 = Play Today
+              mode: 0,                 // 0 = Play Today (your current convention)
               fastestRoute: data.path, // string[]
-              userRoute: route,        // string[] from WorldMap
+              userRoute: route,        // string[]
               maxPoints,
               pointsAwarded: result.points,
             }),
           });
         } catch (e) {
-          // optional: log
+          // optional logging
         }
-      } catch (e) {
-        // optional: handle score/add error
+      } else {
+        // User already scored today → record replay with 0 points
+        setReplay(true);
+        try {
+          await authedFetch("http://localhost:5000/api/game/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mode: 0,
+              fastestRoute: data.path,
+              userRoute: route,
+              maxPoints,
+              pointsAwarded: 0, // explicitly mark replay as unscored
+            }),
+          });
+        } catch (e) {
+          // optional logging
+        }
       }
+    } catch (e) {
+      // optional: handle unexpected errors
     }
+
     setShowCongrats(true);
   }
+
 
   useEffect(() => {
     let ignore = false;
@@ -138,6 +183,7 @@ export default function PlayToday() {
         shortestPath={data.path}
         optimalSteps={optimalSteps}
         points={points}
+        isReplay={replay}
         onContinue={() => navigate("/home")}
       />
     </>
