@@ -38,7 +38,7 @@ router.post("/register", async (req, res) => {
        RETURNING id, username, email, created_at`,
       [username, email, hash]
     );
-    const token = signUser(user);            
+    const token = signUser((rows[0]));            
     return res.status(201).json({ token});  
   } catch (e) {
     console.error(e);
