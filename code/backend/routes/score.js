@@ -32,4 +32,45 @@ router.post("/add", requireAuth, async (req, res) => {
   }
 });
 
+
+router.get("/leaderboard", requireAuth, async (req, res) => {
+  const myId = req.user.id;   // logged-in user
+
+  try {
+    // 1) Get top 100 leaderboard rows
+    const sql = `
+      SELECT id, username, score
+      FROM users
+      ORDER BY score DESC, id ASC
+      LIMIT 100
+    `;
+    const { rows } = await query(sql);
+
+    // 2) Find user index inside the top 100
+    let index = rows.findIndex(row => row.id === myId);
+
+    // 3) If user is NOT in top 100, compute their global rank separately
+    if (index === -1) {
+      const rankSql = `
+        SELECT position FROM (
+          SELECT id, ROW_NUMBER() OVER (ORDER BY score DESC, id ASC) AS position
+          FROM users
+        ) AS ranked
+        WHERE id = $1
+      `;
+      const r = await query(rankSql, [myId]);
+      if (r.rows.length > 0) {
+        index = r.rows[0].position - 1; // convert to 0-based
+      }
+    }
+
+    return res.json({ rows, index });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "db_error" });
+  }
+});
+
+
+
 export default router;

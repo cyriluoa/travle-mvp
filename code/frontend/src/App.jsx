@@ -5,6 +5,7 @@ import RegisterPage from "./components/auth/RegisterPage";
 import HomePage from "./components/home/HomePage";
 import PlayCustom from "./components/home/game/PlayCustom";
 import PlayToday from "./components/home/game/PlayToday";
+import Leaderboard from "./components/home/Leaderboard";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/play/custom" element={<PlayCustom />} />  {/* <-- add */}
         <Route path="/play/today" element={<PlayToday />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />   {/* <-- ADD THIS */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

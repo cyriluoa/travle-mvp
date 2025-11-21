@@ -1,0 +1,131 @@
+/* full-page background, matches home style */
+.lb-wrap {
+  min-height: 100vh;
+  padding: 32px 24px;
+  color: #e6e9ef;
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(89,196,255,.14), transparent),
+    radial-gradient(1000px 500px at 75% 60%, rgba(124,108,255,.14), transparent),
+    linear-gradient(135deg, #0b1020, #101828);
+}
+
+/* top bar with back link, aligned to overall width */
+.lb-header {
+  max-width: 1120px;
+  margin: 0 auto 12px auto;
+}
+
+.lb-back {
+  text-decoration: none;
+  color: #8ab4ff;
+  font-size: 16px;
+  opacity: 0.9;
+}
+.lb-back:hover {
+  opacity: 1;
+}
+
+/* main content, centered */
+.lb-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* big centered title */
+.lb-title {
+  margin: 8px 0 4px 0;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+/* rank text under title */
+.lb-rank {
+  margin-bottom: 20px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* card: make it wider + centered */
+.lb-card {
+  margin: 0 auto;
+  margin-top: 10px;
+  max-width: 820px;
+  background: rgba(16, 22, 40, 0.96);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+
+/* rows */
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(9,14,25,0.9);
+}
+.lb-row:last-child {
+  border-bottom: none;
+}
+
+/* alternating subtle shading */
+.lb-row:nth-child(even) {
+  background: rgba(13,19,32,0.95);
+}
+
+/* clear highlight for current user */
+.lb-row-me {
+  background: linear-gradient(
+    90deg,
+    rgba(200,108,255,0.45),
+    rgba(89,196,255,0.22)
+  );
+  box-shadow: 0 0 0 1px rgba(148,163,255,0.7);
+}
+
+/* left side of row */
+.lb-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-pos {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.lb-name {
+  font-weight: 500;
+}
+
+/* small pill that says "you" */
+.lb-you {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.9);
+  border: 1px solid rgba(248,250,252,0.35);
+  opacity: 0.9;
+}
+
+/* score on the right */
+.lb-score {
+  font-weight: 600;
+}
+
+/* loading / error text */
+.lb-loading,
+.lb-error {
+  margin-top: 16px;
+  font-size: 14px;
+}
+.lb-error {
+  color: #ff9aa2;
+}
