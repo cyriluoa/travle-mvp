@@ -156,4 +156,100 @@ describe("AUTH ROUTES", () => {
 
     expect(res.status).toBe(401);
   });
+  test("register → duplicate email", async () => {
+    query.mockResolvedValueOnce({
+        rows: [{ username: "other", email: "c@x.com" }],
+    });
+
+    const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+        username: "cyril",
+        email: "c@x.com",
+        password: "pass",
+        });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toBe("Email already exists");
+  });
+
+  test("register → duplicate username AND email", async () => {
+    query.mockResolvedValueOnce({
+        rows: [{ username: "cyril", email: "c@x.com" }],
+    });
+
+    const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+        username: "cyril",
+        email: "c@x.com",
+        password: "1234",
+        });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toBe("Username and email already exist");
+});
+
+test("register → database failure on duplicate check", async () => {
+  query.mockRejectedValueOnce(new Error("DB FAIL"));
+
+  const res = await request(app)
+    .post("/api/auth/register")
+    .send({
+      username: "x",
+      email: "x@x.com",
+      password: "123",
+    });
+
+  expect(res.status).toBe(500);
+  expect(res.body.error).toBe("Server error");
+});
+
+test("register → database failure on insert", async () => {
+  query
+    .mockResolvedValueOnce({ rows: [] })  // no duplicate
+    .mockRejectedValueOnce(new Error("DB FAIL"));  // insert fails
+
+  bcrypt.hash.mockResolvedValue("hash");
+
+  const res = await request(app)
+    .post("/api/auth/register")
+    .send({
+      username: "u",
+      email: "u@x.com",
+      password: "123",
+    });
+
+  expect(res.status).toBe(500);
+});
+
+
+
+test("login → token payload is correct", async () => {
+  query
+    .mockResolvedValueOnce({
+      rows: [{
+        id: 10,
+        username: "cyril",
+        email: "c@x.com",
+        password_hash: "hash",
+      }],
+    })
+    .mockResolvedValueOnce({ rows: [] });
+
+  bcrypt.compare.mockResolvedValue(true);
+
+  const res = await request(app)
+    .post("/api/auth/login")
+    .send({
+      identifier: "cyril",
+      password: "123",
+    });
+
+  const payload = jwt.verify(res.body.token, process.env.JWT_SECRET);
+
+  expect(payload.id).toBe(10);
+  expect(payload.username).toBe("cyril");
+  expect(payload.email).toBe("c@x.com");
+});
 });
