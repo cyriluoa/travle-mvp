@@ -8,17 +8,16 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "framer-motion": "^12.23.24",
     "jsonwebtoken": "^9.0.2",
-    "lucide-react": "^0.552.0",
     "pg": "^8.16.3",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "topojson-simplify": "^3.0.3"
   },
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-     "test": "set NODE_OPTIONS=--experimental-vm-modules && jest --runInBand"
+     "test": "set NODE_OPTIONS=--experimental-vm-modules && jest --runInBand",
+     "dev": "node server.js"
   },
   "jest": {
     "testEnvironment": "node",
