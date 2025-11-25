@@ -18,9 +18,10 @@ services:
       - .env.prod
     depends_on:
       - postgres
-    expose:
-      - "5000"
+    ports:
+      - "5000:5000"
     restart: always
+
 
   frontend:
     image: cjcyril/travle-frontend:latest
