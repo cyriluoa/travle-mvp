@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: travle
+      POSTGRES_USER: travle
+      POSTGRES_PASSWORD: prodpass
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+      - ./backend/data/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  backend:
+    image: cjcyril/travle-backend:latest
+    env_file:
+      - .env.prod
+    depends_on:
+      - postgres
+    expose:
+      - "5000"
+    restart: always
+
+  frontend:
+    image: cjcyril/travle-frontend:latest
+    ports:
+      - "8080:80"
+    restart: always
+
+volumes:
+  pgdata_prod:
