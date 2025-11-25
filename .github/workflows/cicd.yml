@@ -45,11 +45,11 @@ jobs:
 
       - name: Build backend image
         run: |
-          docker build -t cjcyril/travle-backend:latest -f code/backend/Dockerfile.prod code/backend
+          docker build -t cjcyril/travle-backend:latest -f code/backend/Dockerfile code/backend
 
       - name: Build frontend image
         run: |
-          docker build -t cjcyril/travle-frontend:latest -f code/frontend/Dockerfile.prod code/frontend
+          docker build -t cjcyril/travle-frontend:latest -f code/frontend/Dockerfile code/frontend
 
       - name: Push backend image
         run: docker push cjcyril/travle-backend:latest
