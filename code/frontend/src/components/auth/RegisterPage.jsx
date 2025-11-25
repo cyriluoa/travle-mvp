@@ -39,6 +39,7 @@ export default function RegisterPage() {
   const [error, setError] = useState(null);
 
   const [showStrengthCard, setShowStrengthCard] = useState(false);
+  const API = import.meta.env.APP_BACKEND_URL;
 
   const pw = scorePassword(password);
   const reqs = {
@@ -63,7 +64,7 @@ export default function RegisterPage() {
     if (!formValid) return;
     setError(null); setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${API}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
