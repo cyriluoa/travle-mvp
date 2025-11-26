@@ -17,7 +17,7 @@ export default function Leaderboard() {
       setErr("");
 
       try {
-        const lbRes = await authedFetch("http://localhost:5000/api/score/leaderboard");
+        const lbRes = await authedFetch("https://backend.cyril-travle-mvp-game.win/api/score/leaderboard");
         const lbJson = await lbRes.json();
 
         if (!lbRes.ok) throw new Error(lbJson.error || "Failed to load leaderboard");

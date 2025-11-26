@@ -82,7 +82,7 @@ export default function HomePage() {
     setLoadingReachable(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reachable?country=${encodeURIComponent(val.trim())}`
+        `https://backend.cyril-travle-mvp-game.win/api/reachable?country=${encodeURIComponent(val.trim())}`
       );
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -120,7 +120,7 @@ export default function HomePage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reachable/path?from=${encodeURIComponent(a)}&to=${encodeURIComponent(b)}`
+        `https://backend.cyril-travle-mvp-game.win/api/reachable/path?from=${encodeURIComponent(a)}&to=${encodeURIComponent(b)}`
       );
       const data = await res.json();
       if (!res.ok || data.error) {

@@ -86,7 +86,7 @@ export default function PlayCustom() {
     setErr("");
 
     fetch(
-      `https://backend.cyril-travle-mvp-game.win/api//reachable/path?from=${encodeURIComponent(
+      `https://backend.cyril-travle-mvp-game.win/api/reachable/path?from=${encodeURIComponent(
         start
       )}&to=${encodeURIComponent(end)}`
     )
