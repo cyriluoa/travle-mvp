@@ -47,14 +47,14 @@ export default function PlayCustom() {
     if (!posted && result.points > 0) {
       setPosted(true);
       try {
-        await authedFetch("http://localhost:5000/api/score/add", {
+        await authedFetch("https://backend.cyril-travle-mvp-game.win/api/score/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ points: result.points }),
         });
         // optional: read { user } = await r.json() and update UI
         try {
-          await authedFetch("http://localhost:5000/api/game/complete", {
+          await authedFetch("https://backend.cyril-travle-mvp-game.win/api/game/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -86,7 +86,7 @@ export default function PlayCustom() {
     setErr("");
 
     fetch(
-      `http://localhost:5000/api/reachable/path?from=${encodeURIComponent(
+      `https://backend.cyril-travle-mvp-game.win/api//reachable/path?from=${encodeURIComponent(
         start
       )}&to=${encodeURIComponent(end)}`
     )

@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const API = import.meta.env.APP_BACKEND_URL;
   const navigate = useNavigate();
 
   async function onSubmit(e) {
@@ -22,7 +21,7 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/login`, {
+      const res = await fetch(`https://backend.cyril-travle-mvp-game.win/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ identifier, password }),

@@ -48,7 +48,7 @@ export default function PlayToday() {
       let playedToday = false;
       try {
         const res = await authedFetch(
-          "http://localhost:5000/api/game/todayStatus",
+          "https://backend.cyril-travle-mvp-game.win/api/game/todayStatus",
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -68,7 +68,7 @@ export default function PlayToday() {
         setReplay(false);
 
         // 1) Add to user's total score
-        await authedFetch("http://localhost:5000/api/score/add", {
+        await authedFetch("https://backend.cyril-travle-mvp-game.win/api/score/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ points: result.points }),
@@ -76,7 +76,7 @@ export default function PlayToday() {
 
         // 2) Record a scored game_history row
         try {
-          await authedFetch("http://localhost:5000/api/game/complete", {
+          await authedFetch("https://backend.cyril-travle-mvp-game.win/api/game/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -94,7 +94,7 @@ export default function PlayToday() {
         // User already scored today → record replay with 0 points
         setReplay(true);
         try {
-          await authedFetch("http://localhost:5000/api/game/complete", {
+          await authedFetch("https://backend.cyril-travle-mvp-game.win/api/game/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -122,7 +122,7 @@ export default function PlayToday() {
     setLoading(true);
     setErr("");
 
-    fetch("http://localhost:5000/api/random-today")
+    fetch("https://backend.cyril-travle-mvp-game.win/api/random-today")
       .then(async (r) => {
         const j = await r.json();
         if (!r.ok) throw new Error(j.error || "Failed");
